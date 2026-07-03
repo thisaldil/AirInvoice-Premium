@@ -145,7 +145,10 @@ function TemplateManager({ invoiceData, onSelectTemplate, onCreateTemplate }) {
               Select a template to use for your new invoice / quotation or create a new template.
             </p>
           </div>
-          <div className="flex border rounded-md overflow-hidden shadow-sm transition-all bg-gray-100 dark:bg-gray-700">
+          <div
+            className="flex border rounded-md overflow-hidden shadow-sm transition-all bg-gray-100 dark:bg-gray-700"
+            data-tour="template-filters"
+          >
             {["all", "invoice", "quotation"].map((type) => (
               <button
                 key={type}
@@ -179,9 +182,13 @@ function TemplateManager({ invoiceData, onSelectTemplate, onCreateTemplate }) {
         </div>
 
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10"
+        data-tour="template-list"
+      >
         {/* Create New Template Card */}
         <div
+          data-tour="template-create-card"
           onClick={onCreateTemplate}
           className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center p-6 cursor-pointer hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 dark:hover:border-blue-400 transition-colors h-full"
         >

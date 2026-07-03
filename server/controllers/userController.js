@@ -11,8 +11,15 @@ const Invoice = require("../models/Invoice");
 // Mark the first-time onboarding guide as completed or skipped.
 exports.markGuideSeen = async (req, res) => {
   try {
-    req.user.hasSeenGuide = true;
-    await req.user.save();
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { $set: { hasSeenGuide: true } },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "Authenticated user was not found" });
+    }
 
     res.status(200).json({
       message: "Onboarding guide marked as seen",

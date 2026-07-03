@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation, Outlet } from "react-router-dom";
 import {
-  Users,
   HomeIcon,
   FileTextIcon,
   SettingsIcon,
@@ -15,6 +14,7 @@ import {
 import logo from "../images/logo.png";
 import darklogo from "../images/drklogo.png";
 import OnboardingGuide from "./onboarding/OnboardingGuide";
+import PageTourManager from "./onboarding/PageTourManager";
 import {
   clearGuidePreference,
   shouldShowGuide,
@@ -25,6 +25,12 @@ function Layout() {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [guideOpen, setGuideOpen] = useState(() => shouldShowGuide());
+
+  useEffect(() => {
+    if (location.pathname === "/dashboard" && shouldShowGuide()) {
+      setGuideOpen(true);
+    }
+  }, [location.pathname]);
 
   const menuItems = [
     { path: "/dashboard", label: "Dashboard", icon: HomeIcon },
@@ -104,6 +110,7 @@ function Layout() {
       </div>
 
       {guideOpen && <OnboardingGuide onClose={() => setGuideOpen(false)} />}
+      <PageTourManager disabled={guideOpen} />
     </div>
   );
 }

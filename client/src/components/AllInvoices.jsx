@@ -167,7 +167,10 @@ const AllInvoices = ({ setGeneratedInvoice }) => {
         All {category === "quotation" ? "Quotations" : "Invoices"}
       </h1>
 
-      <div className="mb-6 flex items-center sm:justify-between justify-center flex-wrap gap-4">
+      <div
+        className="mb-6 flex items-center sm:justify-between justify-center flex-wrap gap-4"
+        data-tour="invoice-list-filters"
+      >
         <div className="relative w-full max-w-md">
           <input
             type="text"
@@ -197,7 +200,10 @@ const AllInvoices = ({ setGeneratedInvoice }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        data-tour="invoice-list"
+      >
         {paginatedInvoices.map((invoice) => (
           <div
             key={invoice._id}
@@ -216,7 +222,10 @@ const AllInvoices = ({ setGeneratedInvoice }) => {
                   <div className="w-10 h-10 mr-3 bg-gray-200 dark:bg-gray-600 rounded" />
                 )}
 
-                <div className="flex flex-row justify-end space-x-4 items-center w-full">
+                <div
+                  className="flex flex-row justify-end space-x-4 items-center w-full"
+                  data-tour="invoice-row-actions"
+                >
                   <span className="text-sm text-gray-500 dark:text-white">
                     {new Date(invoice.date).toISOString().split("T")[0]}
                   </span>

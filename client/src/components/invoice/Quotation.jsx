@@ -126,52 +126,54 @@ const Quotation = ({ onBack, onSubmit }) => {
 
       <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8 space-y-6">
         {/* Passenger Info */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Passenger Name</label>
-          <input
-            className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
-            placeholder="e.g., Some One"
-            required
-            value={invoice.passengerName}
-            onChange={(e) => updateInvoiceField("passengerName", e.target.value)}
-          />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-6" data-tour="quotation-customer-details">
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm font-medium mb-1">Passenger Name</label>
             <input
               className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
-              placeholder="e.g., someone@gmail.com"
+              placeholder="e.g., Some One"
               required
-              value={invoice.email}
-              onChange={(e) => updateInvoiceField("email", e.target.value)}
+              value={invoice.passengerName}
+              onChange={(e) => updateInvoiceField("passengerName", e.target.value)}
             />
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <input
+                className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                placeholder="e.g., someone@gmail.com"
+                required
+                value={invoice.email}
+                onChange={(e) => updateInvoiceField("email", e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Phone</label>
+              <input
+                className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                placeholder="e.g., +94xxxxxxxxx"
+                required
+                value={invoice.phone}
+                onChange={(e) => updateInvoiceField("phone", e.target.value)}
+              />
+            </div>
+          </div>
+
           <div>
-            <label className="block text-sm font-medium mb-1">Phone</label>
+            <label className="block text-sm font-medium mb-1">Address</label>
             <input
               className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
-              placeholder="e.g., +94xxxxxxxxx"
-              required
-              value={invoice.phone}
-              onChange={(e) => updateInvoiceField("phone", e.target.value)}
+              placeholder="e.g., No123 Colombo, Sri Lanka"
+              value={invoice.address}
+              onChange={(e) => updateInvoiceField("address", e.target.value)}
             />
           </div>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium mb-1">Address</label>
-          <input
-            className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
-            placeholder="e.g., No123 Colombo, Sri Lanka"
-            value={invoice.address}
-            onChange={(e) => updateInvoiceField("address", e.target.value)}
-          />
         </div>
 
         {/* Flight Details */}
-        <div className="space-y-4">
+        <div className="space-y-4" data-tour="quotation-flight-details">
           <h2 className="font-semibold">Flight Details</h2>
           {invoice.flightDetails.map((flight, idx) => (
             <div
@@ -360,7 +362,7 @@ const Quotation = ({ onBack, onSubmit }) => {
         </div>
       </div>
 
-      <div className="flex justify-between">
+      <div className="flex justify-between" data-tour="quotation-submit-area">
         <button
           onClick={onBack}
           className="flex items-center px-6 py-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"

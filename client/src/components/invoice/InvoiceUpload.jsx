@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react";
 import { FileUpIcon, FileIcon, CheckCircleIcon, XIcon } from "lucide-react";
 import axios from "axios";
-import { Link } from "react-router-dom";
 
 function InvoiceUpload({ onUpload }) {
   const [file, setFile] = useState(null);
@@ -106,6 +105,7 @@ function InvoiceUpload({ onUpload }) {
 
       {!file ? (
         <div
+          data-tour="invoice-upload-area"
           className={`border-2 border-dashed rounded-lg p-12 text-center ${isDragging
             ? "border-blue-500 bg-blue-50"
             : "border-gray-300 hover:border-blue-400"
@@ -165,6 +165,7 @@ function InvoiceUpload({ onUpload }) {
           </div>
           <div className="flex justify-end">
             <button
+              data-tour="invoice-extract-action"
               onClick={handleProcessInvoice}
               disabled={isProcessing}
               className={`px-4 py-2 rounded-md font-medium ${isProcessing

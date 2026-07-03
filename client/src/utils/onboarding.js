@@ -5,6 +5,40 @@
 // (see authController.js -> recordSuccessfulLogin).
 
 const STORAGE_KEY = "showGuide";
+const PAGE_TOUR_PREFIX = "tourSeen:";
+const PAGE_TOUR_STORAGE_VERSION = "2";
+const PAGE_TOUR_IDS = [
+  "new-invoice",
+  "new-quotation",
+  "templates",
+  "invoices-list",
+];
+
+const getPageTourKey = (guideId) => {
+  const userId = localStorage.getItem("userId") || "guest";
+  return `${PAGE_TOUR_PREFIX}${userId}:${guideId}`;
+};
+
+const resetPageToursForCurrentUser = () => {
+  PAGE_TOUR_IDS.forEach((guideId) => {
+    localStorage.removeItem(getPageTourKey(guideId));
+    localStorage.removeItem(`${PAGE_TOUR_PREFIX}${guideId}`);
+  });
+};
+
+export const preparePageToursForCurrentUser = () => {
+  try {
+    const userId = localStorage.getItem("userId") || "guest";
+    const versionKey = `${PAGE_TOUR_PREFIX}${userId}:version`;
+
+    if (localStorage.getItem(versionKey) !== PAGE_TOUR_STORAGE_VERSION) {
+      resetPageToursForCurrentUser();
+      localStorage.setItem(versionKey, PAGE_TOUR_STORAGE_VERSION);
+    }
+  } catch (error) {
+    console.error("Unable to prepare page tour preferences:", error);
+  }
+};
 
 /**
  * Call this right after a successful login/signup response.
@@ -13,7 +47,14 @@ const STORAGE_KEY = "showGuide";
  */
 export const saveGuidePreference = (data) => {
   try {
-    if (data?.showGuide) {
+    const showGuide =
+      typeof data?.showGuide === "boolean"
+        ? data.showGuide
+        : Number(data?.user?.loginCount) === 1 &&
+          data?.user?.hasSeenGuide !== true;
+
+    if (showGuide) {
+      resetPageToursForCurrentUser();
       localStorage.setItem(STORAGE_KEY, "true");
     } else {
       localStorage.removeItem(STORAGE_KEY);
@@ -44,5 +85,22 @@ export const clearGuidePreference = () => {
     localStorage.removeItem(STORAGE_KEY);
   } catch (error) {
     console.error("Unable to clear onboarding guide preference:", error);
+  }
+};
+
+export const hasSeenPageTour = (guideId) => {
+  try {
+    return localStorage.getItem(getPageTourKey(guideId)) === "true";
+  } catch (error) {
+    console.error(`Unable to read page tour preference for ${guideId}:`, error);
+    return false;
+  }
+};
+
+export const markPageTourSeen = (guideId) => {
+  try {
+    localStorage.setItem(getPageTourKey(guideId), "true");
+  } catch (error) {
+    console.error(`Unable to save page tour preference for ${guideId}:`, error);
   }
 };
