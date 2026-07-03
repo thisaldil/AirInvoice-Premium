@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { API_BASE_URL } from "../../config/api";
+import { saveGuidePreference } from "../../utils/onboarding";
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -13,7 +15,7 @@ const LoginForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await fetch("https://air-invoice-server.vercel.app/auth/login", {
+            const res = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(form),
@@ -36,6 +38,7 @@ const LoginForm = () => {
                 })
             );
             localStorage.setItem("userId", data.userId);
+            saveGuidePreference(data);
 
             navigate("/dashboard");
         } catch (error) {

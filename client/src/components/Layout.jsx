@@ -14,11 +14,17 @@ import {
 } from "lucide-react";
 import logo from "../images/logo.png";
 import darklogo from "../images/drklogo.png";
+import OnboardingGuide from "./onboarding/OnboardingGuide";
+import {
+  clearGuidePreference,
+  shouldShowGuide,
+} from "../utils/onboarding";
 
 function Layout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(() => shouldShowGuide());
 
   const menuItems = [
     { path: "/dashboard", label: "Dashboard", icon: HomeIcon },
@@ -34,6 +40,7 @@ function Layout() {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("user");
+    clearGuidePreference();
     navigate("/login");
   };
 
@@ -63,6 +70,7 @@ function Layout() {
             {menuItems.map((item) => (
               <li key={item.path}>
                 <button
+                  data-tour={item.path === "/dashboard/settings" ? "settings" : undefined}
                   onClick={() => {
                     navigate(item.path);
                     setSidebarOpen(false);
@@ -94,6 +102,8 @@ function Layout() {
       <div className="flex-1 overflow-auto p-8 pt-20 md:pt-8 bg-white dark:bg-gray-900">
         <Outlet />
       </div>
+
+      {guideOpen && <OnboardingGuide onClose={() => setGuideOpen(false)} />}
     </div>
   );
 }

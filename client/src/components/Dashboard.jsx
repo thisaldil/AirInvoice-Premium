@@ -159,7 +159,7 @@ function Dashboard({ setGeneratedInvoice }) {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex justify-between items-center mb-6" data-tour="dashboard">
         <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
           Dashboard
         </h1>
@@ -180,7 +180,10 @@ function Dashboard({ setGeneratedInvoice }) {
           </div>
         )}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div
+        className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10"
+        data-tour="create-template"
+      >
         <Link
           to={`/dashboard/upload`}
           className="bg-blue-500 text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
@@ -232,7 +235,10 @@ function Dashboard({ setGeneratedInvoice }) {
           </div>
         </Link>
       </div>
-      <div className="bg-white rounded-lg shadow-md p-6 mb-8 dark:bg-gray-800 dark:text-white">
+      <div
+        className="bg-white rounded-lg shadow-md p-6 mb-8 dark:bg-gray-800 dark:text-white"
+        data-tour="invoice-section"
+      >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-gray-800 dark:text-white">
             Recent Invoices & Quotations
@@ -265,7 +271,7 @@ function Dashboard({ setGeneratedInvoice }) {
             <tbody>
               {recentInvoices.map((invoice) => (
                 <tr
-                  key={invoice.id}
+                  key={invoice._id}
                   className="border-b border-gray-100 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
                 >
                   <td className="py-4 px-4 text-sm text-gray-800 dark:text-white">

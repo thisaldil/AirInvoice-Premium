@@ -54,6 +54,7 @@ const ocrRoutes = require("./routes/ocrRoutes");
 
 app.use("/auth", authRoutes);
 app.use("/user", userRoutes);
+app.use("/api/user", userRoutes);
 app.use("/template", templateRoutes);
 app.use("/invoice", invoiceRoutes);
 app.use("/ocr", ocrRoutes);

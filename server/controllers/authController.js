@@ -5,6 +5,37 @@ const bcrypt = require("bcrypt");
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+const sanitizeUser = (user) => {
+    const userObj = user.toObject();
+    delete userObj.password;
+    delete userObj.token;
+    return userObj;
+};
+
+const recordSuccessfulLogin = async (user, token) => {
+    const updatedUser = await User.findByIdAndUpdate(
+        user._id,
+        {
+            $inc: { loginCount: 1 },
+            $set: {
+                hasSeenGuide: user.hasSeenGuide === true,
+                token,
+            },
+        },
+        { new: true, runValidators: true }
+    );
+
+    if (!updatedUser) {
+        throw new Error("Authenticated user was not found");
+    }
+
+    return {
+        user: updatedUser,
+        showGuide:
+            updatedUser.loginCount === 1 && updatedUser.hasSeenGuide === false,
+    };
+};
+
 const createUser = async (payload) => {
     const googleId = payload.sub;
     const imageUrl = payload.picture;
@@ -21,15 +52,26 @@ const createUser = async (payload) => {
 };
 
 const handleGoogleRedirect = async (req, res) => {
-    if (!req.user) {
-        return res.status(401).json({ message: "Authentication failed" });
+    try {
+        if (!req.user) {
+            return res.status(401).json({ message: "Authentication failed" });
+        }
+
+        const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: "24h" });
+
+        const { user, showGuide } = await recordSuccessfulLogin(req.user, token);
+
+        res.status(200).json({
+            message: "Authentication successful",
+            user: sanitizeUser(user),
+            token,
+            userId: user._id,
+            showGuide,
+        });
+    } catch (error) {
+        console.error("Google Redirect Error:", error);
+        res.status(500).json({ message: "Unable to complete Google authentication" });
     }
-
-    const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, { expiresIn: "24h" });
-
-    await User.findByIdAndUpdate(req.user._id, { token });
-
-    res.status(200).json({ message: "Authentication successful", user: req.user, token });
 };
 
 const handleGoogleToken = async (req, res) => {
@@ -55,18 +97,15 @@ const handleGoogleToken = async (req, res) => {
 
         const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "24h" });
 
-        await User.findByIdAndUpdate(user._id, { token: jwtToken });
+        const loginResult = await recordSuccessfulLogin(user, jwtToken);
+        user = loginResult.user;
 
         res.status(200).json({
             message: "Authentication successful",
-            user: {
-                googleId: user.googleId,
-                name: user.name,
-                email: user.email,
-                picture: user.picture,
-            },
+            user: sanitizeUser(user),
             token: jwtToken,
             userId: user._id,
+            showGuide: loginResult.showGuide,
         });
     } catch (error) {
         console.error("Google Token Handling Error:", error);
@@ -99,18 +138,14 @@ const handleGoogleRegister = async (req, res) => {
         });
 
         const jwtToken = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "24h" });
-        await User.findByIdAndUpdate(user._id, { token: jwtToken });
+        const loginResult = await recordSuccessfulLogin(user, jwtToken);
 
         res.status(200).json({
             message: "Registration successful",
-            user: {
-                googleId: user.googleId,
-                name: user.name,
-                email: user.email,
-                picture: user.picture,
-            },
+            user: sanitizeUser(loginResult.user),
             token: jwtToken,
             userId: user._id,
+            showGuide: loginResult.showGuide,
         });
     } catch (error) {
         console.error("Google Register Error:", error);
@@ -140,16 +175,14 @@ const handleLogin = async (req, res) => {
 
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: "24h" });
 
-        await User.findByIdAndUpdate(user._id, { token });
-
-        const userObj = user.toObject();
-        delete userObj.password;
+        const loginResult = await recordSuccessfulLogin(user, token);
 
         res.status(200).json({
             message: "Login successful",
-            user: userObj,
+            user: sanitizeUser(loginResult.user),
             token,
             userId: user._id,
+            showGuide: loginResult.showGuide,
         });
     } catch (error) {
         console.error("Login Error:", error);

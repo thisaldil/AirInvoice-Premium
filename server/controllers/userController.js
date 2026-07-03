@@ -8,6 +8,22 @@ const { v4: uuidv4 } = require("uuid");
 const nodemailer = require("nodemailer");
 const Invoice = require("../models/Invoice");
 
+// Mark the first-time onboarding guide as completed or skipped.
+exports.markGuideSeen = async (req, res) => {
+  try {
+    req.user.hasSeenGuide = true;
+    await req.user.save();
+
+    res.status(200).json({
+      message: "Onboarding guide marked as seen",
+      hasSeenGuide: true,
+    });
+  } catch (err) {
+    console.error("Error updating onboarding guide status:", err);
+    res.status(500).json({ message: "Unable to update onboarding guide status" });
+  }
+};
+
 //get user details
 exports.getUserDetails = async (req, res) => {
     try {
@@ -64,4 +80,3 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-

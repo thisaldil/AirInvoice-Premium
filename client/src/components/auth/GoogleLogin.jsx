@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import { API_BASE_URL } from "../../config/api";
+import { saveGuidePreference } from "../../utils/onboarding";
 
 const LoginGoogle = () => {
     const navigate = useNavigate();
@@ -17,7 +19,7 @@ const LoginGoogle = () => {
 
     const handleSuccess = async (response) => {
         try {
-            const res = await fetch("https://air-invoice-server.vercel.app/auth/google/callback", {
+            const res = await fetch(`${API_BASE_URL}/auth/google/callback`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token: response.credential }),
@@ -45,6 +47,7 @@ const LoginGoogle = () => {
                     })
                 );
                 localStorage.setItem("userId", data.userId);
+                saveGuidePreference(data);
                 setIsAuthenticated(true);
                 window.location.href = "/dashboard";
             }
