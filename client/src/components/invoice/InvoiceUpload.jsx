@@ -1,6 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { FileUpIcon, FileIcon, CheckCircleIcon, XIcon } from "lucide-react";
 import axios from "axios";
+import { API_BASE_URL } from "../../config/api";
 
 function InvoiceUpload({ onUpload }) {
   const [file, setFile] = useState(null);
@@ -63,13 +64,9 @@ function InvoiceUpload({ onUpload }) {
       const formData = new FormData();
       formData.append("ticket", file);
 
-      const response = await axios.post(
-        "https://air-invoice-server.vercel.app/ocr/analyze",
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      const response = await axios.post(`${API_BASE_URL}/ocr/analyze`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       if (response.data) {
         onUpload(response.data);
@@ -77,8 +74,13 @@ function InvoiceUpload({ onUpload }) {
         throw new Error("Failed to extract ticket details");
       }
     } catch (err) {
-      console.error("Ticket processing error:", err);
-      setError("Failed to process the ticket. Please try again.");
+      const message =
+        err.response?.data?.detail ||
+        err.response?.data?.error ||
+        err.message ||
+        "Failed to process the ticket. Please try again.";
+      console.warn("Ticket processing failed:", message);
+      setError(message);
     } finally {
       setIsProcessing(false);
     }

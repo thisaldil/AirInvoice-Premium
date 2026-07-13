@@ -11,8 +11,11 @@
   ],
   "ext": "js,json",
   "ignore": [
-    "node_modules",
-    "eng.traineddata"
+    "node_modules/**",
+    "eng.traineddata",
+    "uploads/**",
+    "/tmp/uploads/**"
   ],
+  "legacyWatch": true,
   "exec": "node server.js"
 }

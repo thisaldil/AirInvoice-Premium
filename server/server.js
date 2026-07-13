@@ -91,13 +91,26 @@ app.post("/generate-signature", (req, res) => {
 
 const PORT = process.env.PORT || 5000;
 
+const startServer = () => {
+  const HOST = process.env.NODE_ENV === "development" ? "127.0.0.1" : undefined;
+
+  app.listen(PORT, HOST, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+};
+
 connectDB()
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
+    startServer();
   })
   .catch((error) => {
     console.error("Failed to start server:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.warn("Starting server without MongoDB because NODE_ENV=development.");
+      startServer();
+      return;
+    }
+
     process.exit(1);
   });

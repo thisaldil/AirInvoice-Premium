@@ -60,27 +60,43 @@ TEXT:
 ${text}
 `;
 
-  const response = await axios.post(
-    'https://openrouter.ai/api/v1/chat/completions',
-    {
-      model: 'mistralai/mistral-7b-instruct:free',
-      messages: [
-        {
-          role: 'system',
-          content: 'You are a strict extractor that returns only valid JSON with no extra text.',
-        },
-        { role: 'user', content: prompt }
-      ]
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-      }
-    }
-  );
+  let response;
 
-  const content = response.data.choices[0].message.content.trim();
+  try {
+    response = await axios.post(
+      'https://openrouter.ai/api/v1/chat/completions',
+      {
+        model: 'mistralai/mistral-7b-instruct:free',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a strict extractor that returns only valid JSON with no extra text.',
+          },
+          { role: 'user', content: prompt }
+        ]
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        timeout: 30000,
+      }
+    );
+  } catch (error) {
+    const upstreamMessage =
+      error.response?.data?.error?.message ||
+      error.response?.data?.message ||
+      error.message ||
+      'OpenRouter extraction request failed';
+    throw new Error(upstreamMessage);
+  }
+
+  const content = response.data?.choices?.[0]?.message?.content?.trim();
+  if (!content) {
+    throw new Error("OpenRouter returned an empty extraction response");
+  }
+
   const parsed = safeParseJSON(content);
 
   if (!parsed.bookingReference || !parsed.passengerName || !parsed.flights) {
