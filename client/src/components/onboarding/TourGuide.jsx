@@ -103,9 +103,9 @@ function TourGuide({ steps, onClose, titleId = "tour-title" }) {
           className="fixed rounded-xl border-2 pointer-events-none"
           style={{
             zIndex: 101,
-            borderColor: "#ff751f",
+            borderColor: "#6366f1",
             boxShadow:
-              "0 0 0 9999px rgba(15, 23, 42, 0.72), 0 0 0 5px rgba(255, 117, 31, 0.22)",
+              "0 0 0 9999px rgba(15, 23, 42, 0.72), 0 0 0 5px rgba(99, 102, 241, 0.22)",
           }}
         />
       )}
@@ -124,12 +124,12 @@ function TourGuide({ steps, onClose, titleId = "tour-title" }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -12, scale: 0.98 }}
             transition={{ duration: 0.22 }}
-            className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-gray-800 pointer-events-auto"
+            className="relative w-full max-w-lg overflow-hidden rounded-2xl bg-white shadow-2xl dark:bg-slate-800 pointer-events-auto"
           >
-            <div className="h-1.5 w-full bg-gray-100 dark:bg-gray-700">
+            <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-700">
               <motion.div
                 className="h-full"
-                style={{ backgroundColor: "#ff751f" }}
+                style={{ backgroundColor: "#4f46e5" }}
                 animate={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
                 transition={{ duration: 0.3 }}
               />
@@ -139,7 +139,7 @@ function TourGuide({ steps, onClose, titleId = "tour-title" }) {
               type="button"
               onClick={onClose}
               aria-label="Skip guide"
-              className="absolute right-4 top-5 rounded-full p-2 text-gray-400 transition hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-white"
+              className="absolute right-4 top-5 rounded-full p-2 text-slate-400 transition-colors duration-200 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-700 dark:hover:text-white"
             >
               <X className="h-5 w-5" />
             </button>
@@ -148,8 +148,8 @@ function TourGuide({ steps, onClose, titleId = "tour-title" }) {
               <div
                 className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl text-white shadow-lg"
                 style={{
-                  backgroundColor: "#ff751f",
-                  boxShadow: "0 10px 24px rgba(255, 117, 31, 0.25)",
+                  backgroundColor: "#4f46e5",
+                  boxShadow: "0 10px 24px rgba(79, 70, 229, 0.28)",
                 }}
               >
                 <StepIcon className="h-6 w-6" />
@@ -157,25 +157,25 @@ function TourGuide({ steps, onClose, titleId = "tour-title" }) {
 
               <p
                 className="mb-2 text-xs font-bold uppercase tracking-widest"
-                style={{ color: "#ff751f" }}
+                style={{ color: "#4f46e5" }}
               >
                 Step {currentStep + 1} of {steps.length}
               </p>
               <h2
                 id={titleId}
-                className="pr-8 text-2xl font-bold text-gray-900 dark:text-white"
+                className="pr-8 text-2xl font-bold text-slate-900 dark:text-white"
               >
                 {step.title}
               </h2>
-              <p className="mt-3 text-base leading-7 text-gray-600 dark:text-gray-300">
+              <p className="mt-3 text-base leading-7 text-slate-600 dark:text-slate-300">
                 {step.description}
               </p>
 
-              <div className="mt-7 flex items-center justify-between gap-3 border-t border-gray-100 pt-5 dark:border-gray-700">
+              <div className="mt-7 flex items-center justify-between gap-3 border-t border-slate-100 pt-5 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="rounded-lg px-2 py-2 text-sm font-semibold text-gray-500 transition hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                  className="rounded-lg px-2 py-2 text-sm font-semibold text-slate-500 transition-colors duration-200 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
                 >
                   Skip
                 </button>
@@ -185,7 +185,7 @@ function TourGuide({ steps, onClose, titleId = "tour-title" }) {
                     type="button"
                     onClick={() => setCurrentStep((value) => value - 1)}
                     disabled={currentStep === 0}
-                    className="flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-gray-600 dark:text-gray-200 dark:hover:bg-gray-700"
+                    className="flex items-center gap-1 rounded-lg border border-slate-200 px-3 py-2 text-sm font-semibold text-slate-700 transition-all duration-200 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
                   >
                     <ChevronLeft className="h-4 w-4" />
                     Back
@@ -198,8 +198,8 @@ function TourGuide({ steps, onClose, titleId = "tour-title" }) {
                         ? onClose
                         : () => setCurrentStep((value) => value + 1)
                     }
-                    className="flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-bold text-white shadow-md transition hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:ring-offset-2"
-                    style={{ backgroundColor: "#ff751f" }}
+                    className="flex items-center gap-1 rounded-lg px-4 py-2 text-sm font-bold text-white shadow-md transition-all duration-200 hover:brightness-110 active:scale-[0.97] focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2"
+                    style={{ backgroundColor: "#4f46e5" }}
                   >
                     {isLastStep ? "Finish" : "Next"}
                     {!isLastStep && <ChevronRight className="h-4 w-4" />}

@@ -1,9 +1,51 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { ArrowLeftIcon, ArrowRightIcon, PlusIcon, TrashIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightIcon, PlusIcon, TrashIcon, PlaneIcon, UserIcon } from "lucide-react";
 import AsyncSelect from "react-select/async";
 import debounce from "lodash.debounce";
 import airports from '../../data/airports.json'
 import airlines from '../../data/airlines.json'
+
+// Visual-only overrides for react-select so it matches the rest of the form.
+// No behavior, props, or handlers are changed — only colors/spacing/radius.
+const selectStyles = {
+  control: (base, state) => ({
+    ...base,
+    minHeight: "42px",
+    borderRadius: "0.75rem",
+    borderColor: state.isFocused ? "#6366f1" : "#e2e8f0",
+    boxShadow: state.isFocused ? "0 0 0 3px rgba(99,102,241,0.15)" : "none",
+    backgroundColor: "transparent",
+    "&:hover": { borderColor: "#a5b4fc" },
+    transition: "all 150ms ease",
+  }),
+  placeholder: (base) => ({ ...base, color: "#94a3b8", fontSize: "0.875rem" }),
+  singleValue: (base) => ({ ...base, fontSize: "0.875rem" }),
+  input: (base) => ({ ...base, fontSize: "0.875rem" }),
+  menu: (base) => ({
+    ...base,
+    borderRadius: "0.75rem",
+    overflow: "hidden",
+    boxShadow: "0 10px 30px -5px rgba(15,23,42,0.15)",
+    border: "1px solid #f1f5f9",
+    zIndex: 20,
+  }),
+  option: (base, state) => ({
+    ...base,
+    fontSize: "0.875rem",
+    backgroundColor: state.isSelected
+      ? "#4f46e5"
+      : state.isFocused
+        ? "#eef2ff"
+        : "transparent",
+    color: state.isSelected ? "#fff" : "#1e293b",
+    cursor: "pointer",
+  }),
+};
+
+const inputBase =
+  "w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 hover:border-slate-300 dark:hover:border-slate-500";
+
+const labelBase = "block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1.5";
 
 const Quotation = ({ onBack, onSubmit }) => {
   const [invoice, setInvoice] = useState({
@@ -121,16 +163,36 @@ const Quotation = ({ onBack, onSubmit }) => {
   };
 
   return (
-    <div className="text-gray-800 dark:text-white">
-      <h1 className="text-3xl font-bold mb-6 sm:text-left text-center">Create a Quotation</h1>
+    <div className="text-slate-800 dark:text-white max-w-5xl mx-auto">
+      <style>{`
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-slide-up { animation: fadeSlideUp 0.4s ease-out both; }
+      `}</style>
 
-      <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8 space-y-6">
+      <div className="mb-7 text-center sm:text-left">
+        <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Create a Quotation</h1>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+          Fill in passenger and flight details to generate a quotation.
+        </p>
+      </div>
+
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-5 md:p-7 mb-8 space-y-8">
         {/* Passenger Info */}
-        <div className="space-y-6" data-tour="quotation-customer-details">
+        <div className="space-y-5" data-tour="quotation-customer-details">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10">
+              <UserIcon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <h2 className="font-semibold text-slate-800 dark:text-white">Passenger Details</h2>
+          </div>
+
           <div>
-            <label className="block text-sm font-medium mb-1">Passenger Name</label>
+            <label className={labelBase}>Passenger Name</label>
             <input
-              className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+              className={inputBase}
               placeholder="e.g., Some One"
               required
               value={invoice.passengerName}
@@ -138,11 +200,11 @@ const Quotation = ({ onBack, onSubmit }) => {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
+              <label className={labelBase}>Email</label>
               <input
-                className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                className={inputBase}
                 placeholder="e.g., someone@gmail.com"
                 required
                 value={invoice.email}
@@ -150,9 +212,9 @@ const Quotation = ({ onBack, onSubmit }) => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Phone</label>
+              <label className={labelBase}>Phone</label>
               <input
-                className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                className={inputBase}
                 placeholder="e.g., +94xxxxxxxxx"
                 required
                 value={invoice.phone}
@@ -162,9 +224,9 @@ const Quotation = ({ onBack, onSubmit }) => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Address</label>
+            <label className={labelBase}>Address</label>
             <input
-              className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+              className={inputBase}
               placeholder="e.g., No123 Colombo, Sri Lanka"
               value={invoice.address}
               onChange={(e) => updateInvoiceField("address", e.target.value)}
@@ -172,28 +234,41 @@ const Quotation = ({ onBack, onSubmit }) => {
           </div>
         </div>
 
+        <div className="border-t border-slate-100 dark:border-slate-700" />
+
         {/* Flight Details */}
         <div className="space-y-4" data-tour="quotation-flight-details">
-          <h2 className="font-semibold">Flight Details</h2>
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 rounded-lg bg-sky-50 dark:bg-sky-500/10">
+              <PlaneIcon className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+            </div>
+            <h2 className="font-semibold text-slate-800 dark:text-white">Flight Details</h2>
+          </div>
+
           {invoice.flightDetails.map((flight, idx) => (
             <div
               key={idx}
-              className="border border-gray-200 dark:border-gray-700 p-4 rounded-md bg-gray-50 dark:bg-gray-900 space-y-4"
+              className="relative border border-slate-200 dark:border-slate-600 p-4 md:p-5 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 space-y-5 animate-fade-slide-up"
             >
-              {invoice.flightDetails.length > 1 && (
-                <div className="flex justify-end">
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 px-2.5 py-1 rounded-full">
+                  Flight {idx + 1}
+                </span>
+                {invoice.flightDetails.length > 1 && (
                   <button
                     type="button"
                     onClick={() => handleRemoveFlight(idx)}
-                    className="text-red-500 text-sm hover:underline"
+                    title="Remove flight"
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 transition-all duration-200"
                   >
                     <TrashIcon className="w-4 h-4" />
                   </button>
-                </div>
-              )}
+                )}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Origin</label>
+                  <label className={labelBase}>Origin</label>
                   <AsyncSelect
                     cacheOptions
                     defaultOptions
@@ -202,10 +277,11 @@ const Quotation = ({ onBack, onSubmit }) => {
                     value={selectValue(flight.origin)}
                     placeholder="Search airport..."
                     isClearable
+                    styles={selectStyles}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Destination</label>
+                  <label className={labelBase}>Destination</label>
                   <AsyncSelect
                     cacheOptions
                     defaultOptions
@@ -214,10 +290,11 @@ const Quotation = ({ onBack, onSubmit }) => {
                     value={selectValue(flight.destination)}
                     placeholder="Search airport..."
                     isClearable
+                    styles={selectStyles}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Airline</label>
+                  <label className={labelBase}>Airline</label>
                   <AsyncSelect
                     cacheOptions
                     defaultOptions
@@ -226,25 +303,26 @@ const Quotation = ({ onBack, onSubmit }) => {
                     value={selectAirline(flight.airline)}
                     placeholder="Search airline..."
                     isClearable
+                    styles={selectStyles}
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Flight Number</label>
+                  <label className={labelBase}>Flight Number</label>
                   <input
                     type="text"
-                    className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                    className={inputBase}
                     placeholder="e.g., G xxx"
                     value={flight.flightNumber}
                     onChange={(e) => handleFlightFieldChange(idx, "flightNumber", e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Class</label>
+                  <label className={labelBase}>Class</label>
                   <select
-                    className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                    className={`${inputBase} appearance-none`}
                     value={flight.class}
                     onChange={(e) => handleFlightFieldChange(idx, "class", e.target.value)}
                   >
@@ -255,10 +333,10 @@ const Quotation = ({ onBack, onSubmit }) => {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Terminal</label>
+                  <label className={labelBase}>Terminal</label>
                   <input
                     type="text"
-                    className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                    className={inputBase}
                     placeholder="e.g., Main T"
                     value={flight.terminal}
                     onChange={(e) => handleFlightFieldChange(idx, "terminal", e.target.value)}
@@ -268,28 +346,28 @@ const Quotation = ({ onBack, onSubmit }) => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Departure Date</label>
+                  <label className={labelBase}>Departure Date</label>
                   <input
                     type="date"
-                    className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                    className={inputBase}
                     value={flight.departureDate}
                     onChange={(e) => handleFlightFieldChange(idx, "departureDate", e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Departure Time</label>
+                  <label className={labelBase}>Departure Time</label>
                   <input
                     type="time"
-                    className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                    className={inputBase}
                     value={flight.departureTime}
                     onChange={(e) => handleFlightFieldChange(idx, "departureTime", e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Arrival Date</label>
+                  <label className={labelBase}>Arrival Date</label>
                   <input
                     type="date"
-                    className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                    className={inputBase}
                     value={flight.arrivalDate}
                     onChange={(e) => handleFlightFieldChange(idx, "arrivalDate", e.target.value)}
                   />
@@ -297,39 +375,39 @@ const Quotation = ({ onBack, onSubmit }) => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Arrival Time</label>
+                  <label className={labelBase}>Arrival Time</label>
                   <input
                     type="time"
-                    className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                    className={inputBase}
                     value={flight.arrivalTime}
                     onChange={(e) => handleFlightFieldChange(idx, "arrivalTime", e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Baggage Allowance</label>
+                  <label className={labelBase}>Baggage Allowance</label>
                   <input
                     type="text"
                     placeholder="e.g., 30KG"
-                    className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                    className={inputBase}
                     value={flight.baggage}
                     onChange={(e) => handleFlightFieldChange(idx, "baggage", e.target.value)}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1">Meals</label>
+                  <label className={labelBase}>Meals</label>
                   <input
                     type="text"
                     placeholder="e.g., Veg/Non-Veg/None"
-                    className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                    className={inputBase}
                     value={flight.meals}
                     onChange={(e) => handleFlightFieldChange(idx, "meals", e.target.value)}
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Additional Details</label>
+                <label className={labelBase}>Additional Details</label>
                 <textarea
-                  className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+                  className={`${inputBase} resize-none`}
                   rows={3}
                   value={flight.notes}
                   placeholder="e.g., Layovers, Delaying times & etc..."
@@ -341,20 +419,22 @@ const Quotation = ({ onBack, onSubmit }) => {
 
           <button
             type="button"
-            className="flex items-center text-sm text-blue-600 dark:text-blue-400"
+            className="flex items-center justify-center gap-1.5 w-full text-sm font-medium text-indigo-600 dark:text-indigo-400 border border-dashed border-indigo-300 dark:border-indigo-500/40 rounded-xl py-2.5 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:border-indigo-400 transition-all duration-200"
             onClick={handleAddFlight}
           >
-            <PlusIcon className="w-4 h-4 mr-1" />
+            <PlusIcon className="w-4 h-4" />
             Add Flight
           </button>
         </div>
 
+        <div className="border-t border-slate-100 dark:border-slate-700" />
+
         <div>
-          <label className="block text-sm font-medium mb-1">Total Amount</label>
+          <label className={labelBase}>Total Amount</label>
           <input
             type="text"
             placeholder="e.g., 45000.00"
-            className="w-full p-2 border rounded-md bg-white dark:bg-gray-800"
+            className={inputBase}
             required
             value={invoice.totalAmount}
             onChange={(e) => updateInvoiceField("totalAmount", e.target.value)}
@@ -365,7 +445,7 @@ const Quotation = ({ onBack, onSubmit }) => {
       <div className="flex justify-between" data-tour="quotation-submit-area">
         <button
           onClick={onBack}
-          className="flex items-center px-6 py-2 border rounded-md hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="flex items-center px-5 py-2.5 text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 transition-all duration-200"
         >
           <ArrowLeftIcon className="w-4 h-4 mr-2" />
           Back
@@ -378,7 +458,7 @@ const Quotation = ({ onBack, onSubmit }) => {
             };
             onSubmit(updatedInvoice);
           }}
-          className="flex items-center px-6 py-2 rounded-md bg-blue-600 text-white hover:bg-blue-700"
+          className="flex items-center px-6 py-2.5 text-sm font-medium rounded-xl bg-indigo-600 text-white shadow-sm shadow-indigo-200 hover:bg-indigo-700 hover:shadow-md hover:shadow-indigo-300/50 active:scale-[0.98] transition-all duration-200"
         >
           Submit
           <ArrowRightIcon className="w-4 h-4 ml-2" />

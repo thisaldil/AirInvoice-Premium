@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { FileTextIcon, FileUpIcon, SendIcon, BoxIcon, QuoteIcon } from "lucide-react";
+import {
+  FileTextIcon,
+  FileUpIcon,
+  SendIcon,
+  BoxIcon,
+  QuoteIcon,
+  ArrowUpRightIcon,
+  ArrowDownRightIcon,
+  InboxIcon,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import avatar from '../images/default-avatar.png'
@@ -92,33 +101,53 @@ function Dashboard({ setGeneratedInvoice }) {
     fetchInvoices();
   }, [userId]);
 
+  // Local, lightweight keyframes — no external animation library required.
+  const motionStyles = `
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .animate-fade-slide-up {
+      animation: fadeSlideUp 0.5s ease-out both;
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.4s ease-out both;
+    }
+  `;
+
   if (loading) {
     return (
-      <div className="p-6 space-y-10 animate-pulse">
+      <div className="p-4 md:p-6 space-y-8 md:space-y-10 animate-pulse">
+        <style>{motionStyles}</style>
         <div className="flex justify-between items-center">
-          <div className="h-8 w-48 bg-gray-200 dark:bg-gray-700 rounded-md" />
+          <div className="h-8 w-48 bg-slate-200 dark:bg-slate-700 rounded-lg" />
           <div className="flex items-center space-x-3">
-            <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded-md" />
-            <div className="h-10 w-10 bg-gray-300 dark:bg-gray-600 rounded-full" />
+            <div className="h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded-md" />
+            <div className="h-10 w-10 bg-slate-300 dark:bg-slate-600 rounded-full" />
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded-lg" />
-          <div className="h-24 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="h-28 bg-slate-200 dark:bg-slate-700 rounded-2xl" />
+          <div className="h-28 bg-slate-200 dark:bg-slate-700 rounded-2xl" />
+          <div className="h-28 bg-slate-200 dark:bg-slate-700 rounded-2xl" />
         </div>
 
-        <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-6 space-y-4">
-          <div className="h-6 w-40 bg-gray-300 dark:bg-gray-600 rounded-md" />
-          <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded-md" />
-          <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded-md" />
-          <div className="h-10 w-full bg-gray-200 dark:bg-gray-700 rounded-md" />
+        <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 space-y-4 border border-slate-100 dark:border-slate-700">
+          <div className="h-6 w-40 bg-slate-200 dark:bg-slate-600 rounded-md" />
+          <div className="h-10 w-full bg-slate-100 dark:bg-slate-700 rounded-lg" />
+          <div className="h-10 w-full bg-slate-100 dark:bg-slate-700 rounded-lg" />
+          <div className="h-10 w-full bg-slate-100 dark:bg-slate-700 rounded-lg" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg" />
-          <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg" />
-          <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded-lg" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <div className="h-20 bg-slate-200 dark:bg-slate-700 rounded-2xl" />
+          <div className="h-20 bg-slate-200 dark:bg-slate-700 rounded-2xl" />
+          <div className="h-20 bg-slate-200 dark:bg-slate-700 rounded-2xl" />
         </div>
       </div>
     );
@@ -158,14 +187,25 @@ function Dashboard({ setGeneratedInvoice }) {
   };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6" data-tour="dashboard">
-        <h1 className="text-3xl font-bold text-gray-800 dark:text-white">
-          Dashboard
-        </h1>
+    <div className="p-4 md:p-6 animate-fade-in">
+      <style>{motionStyles}</style>
+
+      {/* Header */}
+      <div
+        className="flex justify-between items-center mb-8"
+        data-tour="dashboard"
+      >
+        <div>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white tracking-tight">
+            Dashboard
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Here's what's happening with your invoices today.
+          </p>
+        </div>
         {user && (
-          <div className="flex items-center space-x-3 ">
-            <span className="hidden md:block text-gray-700 font-medium dark:text-white">
+          <div className="flex items-center space-x-3">
+            <span className="hidden md:block text-slate-700 font-medium dark:text-slate-200">
               {user.name}
             </span>
             <img
@@ -175,139 +215,185 @@ function Dashboard({ setGeneratedInvoice }) {
                   : avatar
               }
               alt={user.name}
-              className="w-10 h-10 object-cover rounded-full border border-gray-300 "
+              className="w-10 h-10 object-cover rounded-full ring-2 ring-white dark:ring-slate-800 shadow-sm border border-slate-200 dark:border-slate-700 transition-transform duration-300 hover:scale-105"
             />
           </div>
         )}
       </div>
+
+      {/* Quick actions */}
       <div
-        className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10"
+        className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10"
         data-tour="create-template"
       >
         <Link
           to={`/dashboard/upload`}
-          className="bg-blue-500 text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+          className="group relative overflow-hidden bg-gradient-to-br from-indigo-600 to-indigo-500 text-white p-6 rounded-2xl shadow-md shadow-indigo-200/60 dark:shadow-none hover:shadow-xl hover:shadow-indigo-300/50 dark:hover:shadow-none transition-all duration-300 hover:-translate-y-1"
         >
-          <div className="flex items-center">
-            <div className="bg-white bg-opacity-30 p-3 rounded-full">
+          <div className="flex items-center relative z-10">
+            <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm group-hover:bg-white/30 transition-colors duration-300">
               <FileUpIcon className="w-6 h-6" />
             </div>
             <div className="ml-4 text-left">
-              <h3 className="text-xl font-semibold">Create a New Invoice</h3>
-              <p className="text-sm text-white text-opacity-90">
+              <h3 className="text-lg font-semibold">Create a New Invoice</h3>
+              <p className="text-sm text-indigo-100">
                 Create a new invoice from airline ticket
               </p>
             </div>
           </div>
+          <ArrowUpRightIcon className="absolute top-5 right-5 w-5 h-5 text-white/50 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
         </Link>
 
         <Link
           to={`/dashboard/quotation`}
-          className="bg-green-500 text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+          className="group relative overflow-hidden bg-gradient-to-br from-sky-600 to-sky-500 text-white p-6 rounded-2xl shadow-md shadow-sky-200/60 dark:shadow-none hover:shadow-xl hover:shadow-sky-300/50 dark:hover:shadow-none transition-all duration-300 hover:-translate-y-1"
         >
-          <div className="flex items-center">
-            <div className="bg-white bg-opacity-30 p-3 rounded-full">
+          <div className="flex items-center relative z-10">
+            <div className="bg-white/20 p-3 rounded-xl backdrop-blur-sm group-hover:bg-white/30 transition-colors duration-300">
               <QuoteIcon className="w-6 h-6" />
             </div>
             <div className="ml-4 text-left">
-              <h3 className="text-xl font-semibold">Create New Quatation</h3>
-              <p className="text-sm text-white text-opacity-90">
-                Create a new quatation for customers
+              <h3 className="text-lg font-semibold">Create New Quotation</h3>
+              <p className="text-sm text-sky-100">
+                Create a new quotation for customers
               </p>
             </div>
           </div>
+          <ArrowUpRightIcon className="absolute top-5 right-5 w-5 h-5 text-white/50 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
         </Link>
 
         <Link
           to={`/dashboard/templates`}
-          className="bg-purple-500 text-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow"
+          className="group relative overflow-hidden bg-gradient-to-br from-slate-800 to-slate-700 text-white p-6 rounded-2xl shadow-md shadow-slate-300/60 dark:shadow-none hover:shadow-xl hover:shadow-slate-400/40 dark:hover:shadow-none transition-all duration-300 hover:-translate-y-1"
         >
-          <div className="flex items-center">
-            <div className="bg-white bg-opacity-30 p-3 rounded-full">
+          <div className="flex items-center relative z-10">
+            <div className="bg-white/10 p-3 rounded-xl backdrop-blur-sm group-hover:bg-white/20 transition-colors duration-300">
               <BoxIcon className="w-6 h-6" />
             </div>
             <div className="ml-4 text-left">
-              <h3 className="text-xl font-semibold">Manage Templates</h3>
-              <p className="text-sm text-white text-opacity-90">
+              <h3 className="text-lg font-semibold">Manage Templates</h3>
+              <p className="text-sm text-slate-300">
                 Manage the created templates
               </p>
             </div>
           </div>
+          <ArrowUpRightIcon className="absolute top-5 right-5 w-5 h-5 text-white/40 group-hover:text-white group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300" />
         </Link>
       </div>
+
+      {/* Recent invoices table */}
       <div
-        className="bg-white rounded-lg shadow-md p-6 mb-8 dark:bg-gray-800 dark:text-white"
+        className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 mb-8 dark:bg-slate-800 dark:border-slate-700 animate-fade-slide-up"
         data-tour="invoice-section"
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
             Recent Invoices & Quotations
           </h2>
-          <Link to={'/dashboard/invoices'} className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium">
+          <Link
+            to={'/dashboard/invoices'}
+            className="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200"
+          >
             View All
+            <ArrowUpRightIcon className="w-3.5 h-3.5" />
           </Link>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-600">
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-white">
-                  Type
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-white">
-                  Customer
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-white">
-                  Date
-                </th>
-                <th className="py-3 px-4 text-left text-sm font-medium text-gray-500 dark:text-white">
-                  Amount
-                </th>
-                <th className="py-3 px-4 text-right text-sm font-medium text-gray-500 dark:text-white">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {recentInvoices.map((invoice) => (
-                <tr
-                  key={invoice._id}
-                  className="border-b border-gray-100 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
-                >
-                  <td className="py-4 px-4 text-sm text-gray-800 dark:text-white">
-                    {invoice.invoiceDetails.type === 'invoice' ? 'Invoice' : 'Quotation'}
-                  </td>
-                  <td className="py-4 px-4 text-sm text-gray-800 dark:text-white">
-                    {invoice.invoiceDetails.passengerName[0]}...
-                  </td>
-                  <td className="py-4 px-4 text-sm text-gray-600 dark:text-white">
-                    {invoice.date}
-                  </td>
-                  <td className="py-4 px-4 text-sm text-gray-800 font-medium dark:text-white">
-                    {invoice.priceDetails.totalAmount}
-                  </td>
-                  <td className="py-4 px-4 text-right">
-                    <button
-                      onClick={() => handleSend(invoice)}
-                      className="text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 mr-3"
-                    >
-                      <FileTextIcon className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleSend(invoice)}
-                      className="text-green-500 hover:text-green-700 dark:text-green-400 dark:hover:text-green-300"
-                    >
-                      <SendIcon className="w-4 h-4" />
-                    </button>
-                  </td>
+
+        {recentInvoices.length === 0 ? (
+          <div className="flex flex-col items-center justify-center text-center py-14">
+            <div className="bg-slate-100 dark:bg-slate-700 p-4 rounded-full mb-4">
+              <InboxIcon className="w-7 h-7 text-slate-400 dark:text-slate-300" />
+            </div>
+            <h3 className="text-base font-semibold text-slate-700 dark:text-slate-200">
+              No invoices yet
+            </h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 max-w-xs">
+              Create your first invoice to see it show up here.
+            </p>
+            <Link
+              to="/dashboard/upload"
+              className="mt-5 inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-lg shadow-sm transition-colors duration-200"
+            >
+              <FileUpIcon className="w-4 h-4" />
+              Create Invoice
+            </Link>
+          </div>
+        ) : (
+          <div className="overflow-x-auto -mx-6">
+            <table className="min-w-full">
+              <thead>
+                <tr className="border-b border-slate-200 dark:border-slate-700">
+                  <th className="py-3 px-6 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                    Type
+                  </th>
+                  <th className="py-3 px-6 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                    Customer
+                  </th>
+                  <th className="py-3 px-6 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                    Date
+                  </th>
+                  <th className="py-3 px-6 text-left text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                    Amount
+                  </th>
+                  <th className="py-3 px-6 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {recentInvoices.map((invoice) => (
+                  <tr
+                    key={invoice._id}
+                    className="border-b border-slate-100 dark:border-slate-700 last:border-0 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors duration-150"
+                  >
+                    <td className="py-4 px-6 text-sm">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                          invoice.invoiceDetails.type === 'invoice'
+                            ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300'
+                            : 'bg-sky-50 text-sky-700 dark:bg-sky-500/10 dark:text-sky-300'
+                        }`}
+                      >
+                        {invoice.invoiceDetails.type === 'invoice' ? 'Invoice' : 'Quotation'}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6 text-sm text-slate-700 dark:text-slate-200">
+                      {invoice.invoiceDetails.passengerName[0]}...
+                    </td>
+                    <td className="py-4 px-6 text-sm text-slate-500 dark:text-slate-400">
+                      {invoice.date}
+                    </td>
+                    <td className="py-4 px-6 text-sm text-slate-900 font-semibold dark:text-white">
+                      {invoice.priceDetails.totalAmount}
+                    </td>
+                    <td className="py-4 px-6 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => handleSend(invoice)}
+                          title="View"
+                          className="p-2 rounded-lg text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:text-slate-400 dark:hover:text-indigo-400 dark:hover:bg-indigo-500/10 transition-all duration-200"
+                        >
+                          <FileTextIcon className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleSend(invoice)}
+                          title="Send"
+                          className="p-2 rounded-lg text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:text-slate-400 dark:hover:text-emerald-400 dark:hover:bg-emerald-500/10 transition-all duration-200"
+                        >
+                          <SendIcon className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {[
           {
             label: "Invoices & Quotations This Month",
@@ -330,26 +416,34 @@ function Dashboard({ setGeneratedInvoice }) {
         ].map((stat, index) => (
           <div
             key={index}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
+            className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-6 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5 animate-fade-slide-up"
+            style={{ animationDelay: `${index * 80}ms` }}
           >
-            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
               {stat.label}
             </p>
             <div className="flex justify-between items-end">
-              <h3 className="text-2xl font-bold text-gray-800 dark:text-white">
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">
                 {stat.value}
               </h3>
-              <span
-                className={`text-sm flex items-center gap-1 ${stat.change === "N/A"
-                  ? "text-gray-400"
-                  : stat.isPositive
-                    ? "text-green-600 dark:text-green-400"
-                    : "text-red-600 dark:text-red-400"
+              {stat.change !== "" && (
+                <span
+                  className={`inline-flex items-center gap-1 text-sm font-medium px-2 py-0.5 rounded-full ${
+                    stat.change === "N/A"
+                      ? "text-slate-400 bg-slate-100 dark:bg-slate-700 dark:text-slate-400"
+                      : stat.isPositive
+                        ? "text-emerald-700 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400"
+                        : "text-rose-700 bg-rose-50 dark:bg-rose-500/10 dark:text-rose-400"
                   }`}
-              >
-                {stat.change === "N/A" ? "N/A" : stat.isPositive ? "↑" : "↓"}{" "}
-                {stat.change}
-              </span>
+                >
+                  {stat.change !== "N/A" && (
+                    stat.isPositive
+                      ? <ArrowUpRightIcon className="w-3.5 h-3.5" />
+                      : <ArrowDownRightIcon className="w-3.5 h-3.5" />
+                  )}
+                  {stat.change}
+                </span>
+              )}
             </div>
           </div>
         ))}

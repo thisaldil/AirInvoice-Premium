@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeftIcon, ArrowRightIcon, TrashIcon } from "lucide-react";
+import { ArrowLeftIcon, ArrowRightIcon, TrashIcon, PlaneIcon, UserIcon, AlertCircleIcon, InboxIcon } from "lucide-react";
+
+const inputBase =
+  "w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 hover:border-slate-300 dark:hover:border-slate-500 read-only:bg-slate-50 dark:read-only:bg-slate-900/40 read-only:cursor-default";
+
+const labelBase = "block text-sm font-medium text-slate-500 dark:text-slate-400 mb-1.5";
 
 function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
   const [countries, setCountries] = useState([]);
@@ -74,21 +79,31 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
   };
 
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
-        Review Extracted Data
-      </h1>
-      <p className="text-gray-600 dark:text-gray-300 mb-8">
-        We've extracted the following information from the air ticket invoice.
-        Please review and make any necessary corrections.
-      </p>
+    <div className="max-w-4xl mx-auto">
+      <style>{`
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-slide-up { animation: fadeSlideUp 0.4s ease-out both; }
+      `}</style>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-8">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-6">
+      <div className="mb-7">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+          Review Extracted Data
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1.5">
+          We've extracted the following information from the air ticket invoice.
+          Please review and make any necessary corrections.
+        </p>
+      </div>
+
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 p-5 md:p-7 mb-8">
+        <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-6">
           Ticket Information
         </h2>
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <Field
               label="Booking Reference"
               value={invoice.bookingReference}
@@ -101,26 +116,40 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
               onEdit={(val) => handleFieldEdit("transactionId", val)}
             />
           </div>
-          <div>
-            {Array.isArray(invoice.passengerName) &&
-              invoice.passengerName.length > 0 && (
-                <div className="space-y-6">
+
+          {/* Passengers */}
+          {Array.isArray(invoice.passengerName) &&
+            invoice.passengerName.length > 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10">
+                    <UserIcon className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+                  </div>
+                  <h3 className="font-semibold text-slate-800 dark:text-white">Passengers</h3>
+                </div>
+
+                <div className="space-y-4">
                   {invoice.passengerName.map((name, idx) => (
                     <div
                       key={idx}
-                      className="relative border border-gray-200 dark:border-gray-600 p-4 space-y-2 rounded-md bg-gray-50 dark:bg-gray-800"
+                      className="relative border border-slate-200 dark:border-slate-600 p-4 md:p-5 space-y-4 rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 animate-fade-slide-up"
                     >
-                      <button
-                        onClick={() => {
-                          const updated = [...invoice.passengerName];
-                          updated.splice(idx, 1);
-                          handleFieldEdit("passengerName", updated);
-                        }}
-                        className="absolute top-2 right-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-                        title="Remove Passenger"
-                      >
-                        <TrashIcon className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center justify-between">
+                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 px-2.5 py-1 rounded-full">
+                          Passenger {idx + 1}
+                        </span>
+                        <button
+                          onClick={() => {
+                            const updated = [...invoice.passengerName];
+                            updated.splice(idx, 1);
+                            handleFieldEdit("passengerName", updated);
+                          }}
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 transition-all duration-200"
+                          title="Remove Passenger"
+                        >
+                          <TrashIcon className="w-4 h-4" />
+                        </button>
+                      </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Field
@@ -153,8 +182,8 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                          <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                            Nationality <span className="text-red-500">*</span>
+                          <label className={labelBase}>
+                            Nationality <span className="text-rose-500">*</span>
                           </label>
                           <select
                             value={invoice.passengers?.[idx]?.nationality || ""}
@@ -166,7 +195,7 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
                               };
                               handleFieldEdit("passengers", updated);
                             }}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                            className={`${inputBase} appearance-none`}
                             required
                           >
                             <option value="">Select Country</option>
@@ -179,9 +208,8 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                            Date of Birth{" "}
-                            <span className="text-red-500">*</span>
+                          <label className={labelBase}>
+                            Date of Birth <span className="text-rose-500">*</span>
                           </label>
                           <input
                             type="date"
@@ -195,14 +223,14 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
                               };
                               handleFieldEdit("passengers", updated);
                             }}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                            className={inputBase}
                             required
                           />
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                            Gender <span className="text-red-500">*</span>
+                          <label className={labelBase}>
+                            Gender <span className="text-rose-500">*</span>
                           </label>
                           <select
                             value={invoice.passengers?.[idx]?.gender || ""}
@@ -214,7 +242,7 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
                               };
                               handleFieldEdit("passengers", updated);
                             }}
-                            className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                            className={`${inputBase} appearance-none`}
                             required
                           >
                             <option value="">Select Gender</option>
@@ -227,74 +255,88 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
                     </div>
                   ))}
                 </div>
-              )}
-          </div>
+              </div>
+            )}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">
-              Flight Details
-            </label>
+          {/* Flight details */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-sky-50 dark:bg-sky-500/10">
+                <PlaneIcon className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+              </div>
+              <h3 className="font-semibold text-slate-800 dark:text-white">Flight Details</h3>
+            </div>
+
             {invoice?.flightDetails?.length > 0 ? (
-              invoice.flightDetails.map((flight, index) => (
-                <div
-                  key={index}
-                  className="bg-gray-50 dark:bg-gray-800 p-4 rounded-md mb-4"
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className="font-medium text-gray-800 dark:text-white">
-                      {flight.flightNumber || `Flight #${index + 1}`}
-                    </h4>
-                    <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-                      {flight.class}
-                    </span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        From
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {flight.from}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        {flight.departureDate} at {flight.departureTime}
-                      </p>
+              <div className="space-y-3">
+                {invoice.flightDetails.map((flight, index) => (
+                  <div
+                    key={index}
+                    className="bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-600 p-4 md:p-5 rounded-2xl"
+                  >
+                    <div className="flex justify-between items-center mb-3">
+                      <h4 className="font-medium text-slate-800 dark:text-white">
+                        {flight.flightNumber || `Flight #${index + 1}`}
+                      </h4>
+                      {flight.class && (
+                        <span className="text-xs font-medium text-indigo-700 bg-indigo-50 dark:bg-indigo-500/10 dark:text-indigo-400 px-2.5 py-1 rounded-full">
+                          {flight.class}
+                        </span>
+                      )}
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        To
-                      </p>
-                      <p className="font-medium text-gray-900 dark:text-white">
-                        {flight.to}
-                      </p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">
-                        {flight.arrivalDate} at {flight.arrivalTime}
-                      </p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-0.5">
+                          From
+                        </p>
+                        <p className="font-medium text-slate-900 dark:text-white">
+                          {flight.from}
+                        </p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          {flight.departureDate} at {flight.departureTime}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs uppercase tracking-wide text-slate-400 dark:text-slate-500 mb-0.5">
+                          To
+                        </p>
+                        <p className="font-medium text-slate-900 dark:text-white">
+                          {flight.to}
+                        </p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          {flight.arrivalDate} at {flight.arrivalTime}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700 text-sm text-slate-500 dark:text-slate-400">
+                      Airline: {flight.airline || "-"} &nbsp;|&nbsp; Terminal:{" "}
+                      {flight.departureTerminal || "-"}
                     </div>
                   </div>
-                  <div className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                    Airline: {flight.airline || "-"} | Terminal:{" "}
-                    {flight.departureTerminal || "-"}
-                  </div>
-                </div>
-              ))
+                ))}
+              </div>
             ) : (
-              <p className="text-gray-500 dark:text-gray-400">
-                No flight details available.
-              </p>
+              <div className="flex flex-col items-center justify-center text-center py-10 border border-dashed border-slate-200 dark:border-slate-600 rounded-2xl">
+                <InboxIcon className="w-6 h-6 text-slate-300 dark:text-slate-500 mb-2" />
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  No flight details available.
+                </p>
+              </div>
             )}
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="border-t border-slate-100 dark:border-slate-700" />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                  Currency <span className="text-red-500">*</span>
+                <label className={labelBase}>
+                  Currency <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={invoice.currency || ""}
                   onChange={(e) => handleFieldEdit("currency", e.target.value)}
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                  className={`${inputBase} appearance-none`}
                   required
                 >
                   <option value="">Select Currency</option>
@@ -306,15 +348,15 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                  Payment Method <span className="text-red-500">*</span>
+                <label className={labelBase}>
+                  Payment Method <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={invoice.paymentMethod || ""}
                   onChange={(e) =>
                     handleFieldEdit("paymentMethod", e.target.value)
                   }
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                  className={`${inputBase} appearance-none`}
                   required
                 >
                   <option value="">Select Payment Method</option>
@@ -324,11 +366,11 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-                Total Amount <span className="text-red-500">*</span>
+              <label className={labelBase}>
+                Total Amount <span className="text-rose-500">*</span>
               </label>
-              <div className="flex items-center">
-                <span className="mr-2 text-gray-500 dark:text-gray-400 font-bold">
+              <div className="flex items-center gap-2">
+                <span className="text-slate-500 dark:text-slate-400 font-semibold text-sm">
                   {invoice.currency}
                 </span>
                 <input
@@ -336,14 +378,15 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
                   value={invoice.totalAmount || ""}
                   onChange={(e) => handleAmountChange(e.target.value)}
                   placeholder="e.g., 45000.00"
-                  className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+                  className={inputBase}
                   required
                 />
               </div>
               {invoice.totalAmount &&
                 (isNaN(invoice.totalAmount) ||
                   parseFloat(invoice.totalAmount) <= 0) && (
-                  <p className="text-red-500 text-sm mt-1">
+                  <p className="flex items-center gap-1.5 text-rose-600 dark:text-rose-400 text-sm mt-2">
+                    <AlertCircleIcon className="w-3.5 h-3.5 flex-shrink-0" />
                     Amount must be a number greater than 0
                   </p>
                 )}
@@ -355,7 +398,7 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
       <div className="flex justify-between">
         <button
           onClick={onBack}
-          className="flex items-center px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800"
+          className="flex items-center px-5 py-2.5 text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 transition-all duration-200"
         >
           <ArrowLeftIcon className="w-4 h-4 mr-2" />
           Back
@@ -363,10 +406,11 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
         <button
           onClick={onContinue}
           disabled={!isValid}
-          className={`flex items-center px-6 py-2 rounded-md ${isValid
-            ? "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
-            : "bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-            }`}
+          className={`flex items-center px-6 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
+            isValid
+              ? "bg-indigo-600 text-white shadow-sm shadow-indigo-200 hover:bg-indigo-700 hover:shadow-md hover:shadow-indigo-300/50 active:scale-[0.98]"
+              : "bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+          }`}
         >
           Continue
           <ArrowRightIcon className="w-4 h-4 ml-2" />
@@ -378,8 +422,8 @@ function InvoicePreview({ invoice = {}, onContinue, onBack, onEdit }) {
 
 const Field = ({ label, value, onEdit, readOnly, placeholder, required }) => (
   <div>
-    <label className="block text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">
-      {label} {required && <span className="text-red-500">*</span>}
+    <label className={labelBase}>
+      {label} {required && <span className="text-rose-500">*</span>}
     </label>
     <input
       type="text"
@@ -388,7 +432,7 @@ const Field = ({ label, value, onEdit, readOnly, placeholder, required }) => (
       readOnly={readOnly}
       required={required}
       placeholder={placeholder}
-      className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+      className={inputBase}
     />
   </div>
 );

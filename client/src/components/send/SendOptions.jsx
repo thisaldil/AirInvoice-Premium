@@ -6,8 +6,13 @@ import {
   PhoneIcon,
   ArrowLeftIcon,
   CheckIcon,
+  Loader2Icon,
+  FileTextIcon,
 } from "lucide-react";
 import toast from 'react-hot-toast';
+
+const selectInputBase =
+  "p-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition-all duration-200 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15 hover:border-slate-300 dark:hover:border-slate-500";
 
 function SendOptions({ invoice, onBack }) {
   const [invoiceData, setInvoiceData] = useState(null);
@@ -125,28 +130,51 @@ function SendOptions({ invoice, onBack }) {
     fetchCountryCodes();
   }, []);
 
+  const isSendDisabled =
+    !sendMethod ||
+    (sendMethod === "email" && !email) ||
+    (sendMethod === "whatsapp" && !phone) ||
+    isSending;
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-white mb-6">
-        Send {invoiceData?.invoiceDetails.type === "quotation" ? 'Quotation' : 'Invoice'}
-      </h1>
-      <p className="text-gray-600 dark:text-gray-300 mb-8">
-        Your {invoiceData?.invoiceDetails.type === "quotation" ? 'quotation' : 'invoice'} is ready!
-        Preview it below and choose how you'd like to send it.
-      </p>
-      <div className="flex flex-col md:flex-row gap-8 mb-8">
-        <div className="md:w-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-          <div className="p-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600 flex justify-between items-center">
-            <h2 className="font-medium text-gray-800 dark:text-white">
-              Invoice Preview
+    <div className="max-w-6xl mx-auto">
+      <style>{`
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-slide-up { animation: fadeSlideUp 0.35s ease-out both; }
+      `}</style>
+
+      <div className="mb-7">
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
+          Send {invoiceData?.invoiceDetails.type === "quotation" ? 'Quotation' : 'Invoice'}
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-1.5">
+          Your {invoiceData?.invoiceDetails.type === "quotation" ? 'quotation' : 'invoice'} is ready!
+          Preview it below and choose how you'd like to send it.
+        </p>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-6 mb-8 items-start">
+        {/* Preview */}
+        <div className="md:w-1/2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700 overflow-hidden">
+          <div className="p-4 bg-slate-50 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center">
+            <h2 className="font-semibold text-sm text-slate-800 dark:text-white">
+              {invoiceData?.invoiceDetails.type === "quotation" ? 'Quotation' : 'Invoice'} Preview
             </h2>
             {invoiceData?.pdfUrl && (
               <button
                 onClick={handleDownload}
-                className="text-blue-600 hover:text-blue-800 flex items-center text-sm"
+                disabled={isDownloading}
+                className="inline-flex items-center gap-1.5 text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium transition-colors duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <DownloadIcon className="w-4 h-4 mr-1" />
-                {isDownloading ? "Downloading..." : "Download Invoice"}
+                {isDownloading ? (
+                  <Loader2Icon className="w-4 h-4 animate-spin" />
+                ) : (
+                  <DownloadIcon className="w-4 h-4" />
+                )}
+                {isDownloading ? "Downloading..." : "Download"}
               </button>
             )}
           </div>
@@ -157,101 +185,108 @@ function SendOptions({ invoice, onBack }) {
                 title="PDF Preview"
                 width="100%"
                 height="500px"
-                className="border rounded"
+                className="border border-slate-200 dark:border-slate-600 rounded-xl"
               />
             ) : (
-              <p className="text-gray-500 dark:text-gray-300">
-                Loading preview...
-              </p>
+              <div className="w-full h-[500px] flex flex-col items-center justify-center gap-3 text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-900/40 rounded-xl">
+                <FileTextIcon className="w-8 h-8 animate-pulse" />
+                <p className="text-sm">Loading preview...</p>
+              </div>
             )}
           </div>
         </div>
 
-        <div className="md:w-1/2 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-          <div className="p-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-600">
-            <h2 className="font-medium text-gray-800 dark:text-white">
+        {/* Send options */}
+        <div className="md:w-1/2 w-full bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+          <div className="p-4 bg-slate-50 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-700">
+            <h2 className="font-semibold text-sm text-slate-800 dark:text-white">
               Send Options
             </h2>
           </div>
-          <div className="p-6">
+          <div className="p-5 md:p-6">
             <div className="space-y-6">
               <div>
-                <h3 className="text-lg font-medium text-gray-800 dark:text-white mb-4">
-                  How would you like to send this invoice?
+                <h3 className="text-base font-semibold text-slate-800 dark:text-white mb-4">
+                  How would you like to send this?
                 </h3>
                 <div className="space-y-3">
                   <button
                     onClick={() => setSendMethod("email")}
-                    className={`flex items-center w-full p-3 border rounded-md ${sendMethod === "email"
-                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900"
-                      : "border-gray-300 dark:border-gray-600 hover:border-blue-300 hover:bg-blue-50 dark:hover:bg-gray-700"
-                      }`}
+                    className={`flex items-center w-full p-3.5 border rounded-xl text-left transition-all duration-200 ${
+                      sendMethod === "email"
+                        ? "border-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 shadow-sm"
+                        : "border-slate-200 dark:border-slate-600 hover:border-indigo-300 hover:bg-indigo-50/50 dark:hover:bg-slate-700"
+                    }`}
                   >
                     <div
-                      className={`p-2 rounded-full mr-4 ${sendMethod === "email"
-                        ? "bg-blue-100"
-                        : "bg-gray-100 dark:bg-gray-800"
-                        }`}
+                      className={`p-2.5 rounded-xl mr-4 transition-colors duration-200 ${
+                        sendMethod === "email"
+                          ? "bg-indigo-100 dark:bg-indigo-500/20"
+                          : "bg-slate-100 dark:bg-slate-700"
+                      }`}
                     >
                       <MailIcon
-                        className={`w-5 h-5 ${sendMethod === "email"
-                          ? "text-blue-600"
-                          : "text-gray-500 dark:text-gray-400"
-                          }`}
+                        className={`w-5 h-5 ${
+                          sendMethod === "email"
+                            ? "text-indigo-600 dark:text-indigo-400"
+                            : "text-slate-500 dark:text-slate-400"
+                        }`}
                       />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-800 dark:text-white">
+                      <h4 className="font-medium text-sm text-slate-800 dark:text-white">
                         Send via Email
                       </h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Send the invoice directly to your client's email address
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Send directly to your client's email address
                       </p>
                     </div>
                     {sendMethod === "email" && (
-                      <CheckIcon className="w-5 h-5 text-blue-600" />
+                      <CheckIcon className="w-5 h-5 text-indigo-600 dark:text-indigo-400 flex-shrink-0" />
                     )}
                   </button>
 
                   <button
                     onClick={() => setSendMethod("whatsapp")}
-                    className={`flex items-center w-full p-3 border rounded-md ${sendMethod === "whatsapp"
-                      ? "border-green-500 bg-green-50 dark:bg-green-900"
-                      : "border-gray-300 dark:border-gray-600 hover:border-green-300 hover:bg-green-50 dark:hover:bg-gray-700"
-                      }`}
+                    className={`flex items-center w-full p-3.5 border rounded-xl text-left transition-all duration-200 ${
+                      sendMethod === "whatsapp"
+                        ? "border-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 shadow-sm"
+                        : "border-slate-200 dark:border-slate-600 hover:border-emerald-300 hover:bg-emerald-50/50 dark:hover:bg-slate-700"
+                    }`}
                   >
                     <div
-                      className={`p-2 rounded-full mr-4 ${sendMethod === "whatsapp"
-                        ? "bg-green-100"
-                        : "bg-gray-100 dark:bg-gray-800"
-                        }`}
+                      className={`p-2.5 rounded-xl mr-4 transition-colors duration-200 ${
+                        sendMethod === "whatsapp"
+                          ? "bg-emerald-100 dark:bg-emerald-500/20"
+                          : "bg-slate-100 dark:bg-slate-700"
+                      }`}
                     >
                       <PhoneIcon
-                        className={`w-5 h-5 ${sendMethod === "whatsapp"
-                          ? "text-green-600"
-                          : "text-gray-500 dark:text-gray-400"
-                          }`}
+                        className={`w-5 h-5 ${
+                          sendMethod === "whatsapp"
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : "text-slate-500 dark:text-slate-400"
+                        }`}
                       />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-800 dark:text-white">
+                      <h4 className="font-medium text-sm text-slate-800 dark:text-white">
                         Send via WhatsApp
                       </h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Send the invoice through WhatsApp to your client's phone
-                        number
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        Send through WhatsApp to your client's phone number
                       </p>
                     </div>
                     {sendMethod === "whatsapp" && (
-                      <CheckIcon className="w-5 h-5 text-blue-600" />
+                      <CheckIcon className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0" />
                     )}
                   </button>
                 </div>
               </div>
 
               {sendMethod === "email" && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <div className="animate-fade-slide-up">
+                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1.5">
                     Recipient Email Address
                   </label>
                   <input
@@ -259,21 +294,21 @@ function SendOptions({ invoice, onBack }) {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="client@example.com"
-                    className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-white"
+                    className={`w-full ${selectInputBase}`}
                   />
                 </div>
               )}
 
               {sendMethod === "whatsapp" && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <div className="animate-fade-slide-up">
+                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-1.5">
                     Recipient Phone Number
                   </label>
                   <div className="flex gap-2">
                     <select
                       value={selectedCode}
                       onChange={(e) => setSelectedCode(e.target.value)}
-                      className="w-1/3 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-white"
+                      className={`w-2/5 sm:w-1/3 ${selectInputBase} appearance-none`}
                     >
                       {countryCodes.map((c) => (
                         <option key={c.code} value={c.code}>
@@ -286,43 +321,37 @@ function SendOptions({ invoice, onBack }) {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="712345678"
-                      className="w-2/3 p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-white"
+                      className={`w-3/5 sm:w-2/3 ${selectInputBase}`}
                     />
                   </div>
                 </div>
               )}
 
               {isSent && (
-                <div className="bg-green-50 dark:bg-green-800 text-green-800 dark:text-green-200 p-3 rounded-md flex items-center">
-                  <CheckIcon className="w-5 h-5 mr-2" />
-                  <span>Invoice sent successfully!</span>
+                <div className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-500/20 p-3.5 rounded-xl flex items-center gap-2 animate-fade-slide-up">
+                  <CheckIcon className="w-5 h-5 flex-shrink-0" />
+                  <span className="text-sm font-medium">Invoice sent successfully!</span>
                 </div>
               )}
 
-              <div className="flex justify-between pt-4">
+              <div className="flex justify-between pt-2">
                 <button
                   onClick={onBack}
-                  className="flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-800 dark:text-white"
+                  className="flex items-center px-5 py-2.5 text-sm font-medium rounded-xl border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 hover:border-slate-300 transition-all duration-200"
                 >
                   <ArrowLeftIcon className="w-4 h-4 mr-2" />
                   Back
                 </button>
                 <button
                   onClick={handleSend}
-                  disabled={
-                    !sendMethod ||
-                    (sendMethod === "email" && !email) ||
-                    (sendMethod === "whatsapp" && !phone) ||
-                    isSending
-                  }
-                  className={`px-6 py-2 rounded-md ${!sendMethod ||
-                    (sendMethod === "email" && !email) ||
-                    (sendMethod === "whatsapp" && !phone) ||
-                    isSending
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-blue-600 text-white hover:bg-blue-700"
-                    }`}
+                  disabled={isSendDisabled}
+                  className={`inline-flex items-center gap-2 px-6 py-2.5 text-sm font-medium rounded-xl transition-all duration-200 ${
+                    isSendDisabled
+                      ? "bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed"
+                      : "bg-indigo-600 text-white shadow-sm shadow-indigo-200 hover:bg-indigo-700 hover:shadow-md hover:shadow-indigo-300/50 active:scale-[0.98]"
+                  }`}
                 >
+                  {isSending && <Loader2Icon className="w-4 h-4 animate-spin" />}
                   {isSending ? "Sending..." : "Send Invoice"}
                 </button>
               </div>
